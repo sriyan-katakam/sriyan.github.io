@@ -2,7 +2,7 @@
 // FIREBASE SETUP
 // ═══════════════════════════════
 const firebaseConfig = {
-  apiKey:  "AIzaSyBb1BAW7lQ5kCGL38FYKlPc8e7d1X9i5jE",
+  apiKey: "AIzaSyBb1BAW7lQ5kCGL38FYKlPc8e7d1X9i5jE",
   authDomain: "sriyan-portfolio.firebaseapp.com",
   projectId: "sriyan-portfolio",
   appId: "1:265311303054:web:64e8eb6a7a8f8d9853a0df"
@@ -19,15 +19,15 @@ let isAdmin = false;
 let allProjects = [];
 
 // ✅ DEFAULT TAB
-let currentTab = 'apps';
-let currentModalTab = 'apps';
+let currentTab = "apps";
+let currentModalTab = "apps";
 
 // ═══════════════════════════════
 // TAB SWITCHING
 // ═══════════════════════════════
-document.getElementById('tabsNav').addEventListener('click', function(e) {
+document.getElementById("tabsNav").addEventListener("click", function (e) {
 
-  const btn = e.target.closest('.tab-btn');
+  const btn = e.target.closest(".tab-btn");
 
   if (!btn) return;
 
@@ -43,40 +43,42 @@ function switchTab(tab) {
 
   currentTab = tab;
 
-  // Active button
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove('active');
+  // Remove active state
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.classList.remove("active");
   });
 
+  // Add active
   const activeBtn = document.querySelector(`[data-tab="${tab}"]`);
 
   if (activeBtn) {
-    activeBtn.classList.add('active');
+    activeBtn.classList.add("active");
   }
 
   // Hide all grids
-  document.querySelectorAll('.projects-grid').forEach(grid => {
-    grid.style.display = 'none';
+  document.querySelectorAll(".projects-grid").forEach(grid => {
+    grid.style.display = "none";
   });
 
   // Hide all headers
-  document.querySelectorAll('.section-header').forEach(header => {
-    header.style.display = 'none';
+  document.querySelectorAll(".section-header").forEach(header => {
+    header.style.display = "none";
   });
 
-  // Show selected
+  // Show selected tab
   const selectedGrid = document.getElementById(`projectsGrid-${tab}`);
   const selectedHeader = document.getElementById(`header-${tab}`);
 
   if (selectedGrid) {
-    selectedGrid.style.display = 'grid';
+    selectedGrid.style.display = "grid";
   }
 
   if (selectedHeader) {
-    selectedHeader.style.display = 'flex';
+    selectedHeader.style.display = "flex";
   }
 
   renderProjects(tab);
+
 }
 
 // ═══════════════════════════════
@@ -122,12 +124,12 @@ auth.onAuthStateChanged(user => {
 // ═══════════════════════════════
 function applyAccessControl() {
 
-  document.querySelectorAll('.btn-add-project').forEach(btn => {
-    btn.style.display = isAdmin ? 'inline-flex' : 'none';
+  document.querySelectorAll(".btn-add-project").forEach(btn => {
+    btn.style.display = isAdmin ? "inline-flex" : "none";
   });
 
-  document.querySelectorAll('.btn-delete-project').forEach(btn => {
-    btn.style.display = isAdmin ? 'inline-flex' : 'none';
+  document.querySelectorAll(".btn-delete-project").forEach(btn => {
+    btn.style.display = isAdmin ? "inline-flex" : "none";
   });
 
 }
@@ -139,37 +141,72 @@ function listenProjects() {
 
   db.collection("projects")
     .orderBy("createdAt", "desc")
-    .onSnapshot(snapshot => {
+    .onSnapshot(
 
-      allProjects = snapshot.docs.map(doc => ({
-        docId: doc.id,
-        ...doc.data()
-      }));
+      snapshot => {
 
-      updateCounts();
+        allProjects = snapshot.docs.map(doc => ({
+          docId: doc.id,
+          ...doc.data()
+        }));
 
-      // ✅ ALWAYS SHOW WEB APPS FIRST
-      switchTab(currentTab || 'apps');
+        updateCounts();
 
-    }, error => {
+        // ✅ FORCE WEB APPS EVERY TIME
+        currentTab = "apps";
 
-      console.error("Firestore listener error:", error);
+        // Remove active
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+          btn.classList.remove("active");
+        });
 
-    });
+        // Activate apps
+        const appsBtn = document.querySelector('[data-tab="apps"]');
+
+        if (appsBtn) {
+          appsBtn.classList.add("active");
+        }
+
+        // Hide all grids
+        document.querySelectorAll(".projects-grid").forEach(grid => {
+          grid.style.display = "none";
+        });
+
+        // Hide all headers
+        document.querySelectorAll(".section-header").forEach(header => {
+          header.style.display = "none";
+        });
+
+        // Show apps
+        document.getElementById("projectsGrid-apps").style.display = "grid";
+        document.getElementById("header-apps").style.display = "flex";
+
+        // Render apps only
+        renderProjects("apps");
+
+      },
+
+      error => {
+        console.error("Firestore listener error:", error);
+      }
+
+    );
 
 }
 
 function updateCounts() {
 
-  ['scratch', 'ai', 'apps'].forEach(module => {
+  ["scratch", "ai", "apps"].forEach(module => {
 
-    const count = allProjects.filter(p => p.module === module).length;
+    const count = allProjects.filter(
+      p => p.module === module
+    ).length;
 
     const el = document.getElementById(`count-${module}`);
 
     if (el) {
       el.textContent =
-        count + ' project' + (count !== 1 ? 's' : '');
+        count + " project" + (count !== 1 ? "s" : "");
     }
 
   });
@@ -202,7 +239,7 @@ function initEmojiPicker() {
     btn.textContent = emoji;
     btn.type = "button";
 
-    btn.addEventListener('click', () => {
+    btn.addEventListener("click", () => {
 
       selectedEmoji = emoji;
 
@@ -229,18 +266,20 @@ function renderProjects(module) {
 
   if (!grid) return;
 
-  const filtered = allProjects.filter(p => p.module === module);
+  const filtered = allProjects.filter(
+    p => p.module === module
+  );
 
-  grid.innerHTML = '';
+  grid.innerHTML = "";
 
   if (filtered.length === 0) {
 
     const emoji =
-      module === 'scratch'
-        ? '🐱'
-        : module === 'ai'
-        ? '🤖'
-        : '📱';
+      module === "scratch"
+        ? "🐱"
+        : module === "ai"
+        ? "🤖"
+        : "📱";
 
     grid.innerHTML = `
       <div class="empty-state">
@@ -260,20 +299,22 @@ function renderProjects(module) {
 
 function createProjectCard(p, module) {
 
-  const card = document.createElement('div');
+  const card = document.createElement("div");
 
-  card.className = 'project-card';
+  card.className = "project-card";
 
-  let projectURL = '';
-  let editorURL = '';
-  let thumbURL = '';
-  let actionHTML = '';
+  let projectURL = "";
+  let editorURL = "";
+  let thumbURL = "";
+  let actionHTML = "";
 
-  if (module === 'scratch') {
+  if (module === "scratch") {
 
-    projectURL = `https://scratch.mit.edu/projects/${p.scratchId}`;
+    projectURL =
+      `https://scratch.mit.edu/projects/${p.scratchId}`;
 
-    editorURL = `${projectURL}/editor`;
+    editorURL =
+      `${projectURL}/editor`;
 
     thumbURL =
       `https://uploads.scratch.mit.edu/projects/thumbnails/${p.scratchId}.png`;
@@ -283,9 +324,9 @@ function createProjectCard(p, module) {
       <a class="btn-see" href="${editorURL}" target="_blank">See</a>
     `;
 
-  } else if (module === 'ai') {
+  } else if (module === "ai") {
 
-    projectURL = p.projectURL || '#';
+    projectURL = p.projectURL || "#";
 
     actionHTML = `
       <a class="btn-play" href="${projectURL}" target="_blank">🚀 Open</a>
@@ -293,7 +334,7 @@ function createProjectCard(p, module) {
 
   } else {
 
-    projectURL = p.projectURL || '#';
+    projectURL = p.projectURL || "#";
 
     actionHTML = `
       <a class="btn-play" href="${projectURL}" target="_blank">🌐 Visit</a>
@@ -307,17 +348,17 @@ function createProjectCard(p, module) {
       ${
         thumbURL
           ? `<img src="${thumbURL}" alt="${p.title}" loading="lazy">`
-          : `<div class="thumb-fallback">${p.emoji || '🎮'}</div>`
+          : `<div class="thumb-fallback">${p.emoji || "🎮"}</div>`
       }
 
       <div class="overlay">
         <div class="overlay-play">
           ${
-            module === 'scratch'
-              ? '▶ Play'
-              : module === 'ai'
-              ? '🚀 Open'
-              : '🌐 Visit'
+            module === "scratch"
+              ? "▶ Play"
+              : module === "ai"
+              ? "🚀 Open"
+              : "🌐 Visit"
           }
         </div>
       </div>
@@ -333,7 +374,7 @@ function createProjectCard(p, module) {
       ${
         p.description
           ? `<div class="card-desc">${p.description}</div>`
-          : ''
+          : ""
       }
 
       <div class="card-actions">
@@ -364,9 +405,9 @@ function closeModal() {
   document.getElementById("modalOverlay")
     .classList.remove("open");
 
-  document.getElementById('inputId').value = '';
-  document.getElementById('inputTitle').value = '';
-  document.getElementById('inputDesc').value = '';
+  document.getElementById("inputId").value = "";
+  document.getElementById("inputTitle").value = "";
+  document.getElementById("inputDesc").value = "";
 
 }
 
@@ -377,36 +418,8 @@ function openDeleteModal(tab) {
 
   currentModalTab = tab;
 
-  const overlay =
-    document.getElementById("deleteModalOverlay");
-
-  const list =
-    document.getElementById("deleteCheckboxList");
-
-  const filtered =
-    allProjects.filter(p => p.module === tab);
-
-  overlay.classList.add("open");
-
-  list.innerHTML = "";
-
-  filtered.forEach(project => {
-
-    const item = document.createElement("label");
-
-    item.className = "project-checkbox-item";
-
-    item.innerHTML = `
-      <input type="checkbox" value="${project.docId}">
-      <div class="item-emoji">${project.emoji || "🎮"}</div>
-      <div class="item-info">
-        <div class="item-title">${project.title}</div>
-      </div>
-    `;
-
-    list.appendChild(item);
-
-  });
+  document.getElementById("deleteModalOverlay")
+    .classList.add("open");
 
 }
 
@@ -420,46 +433,46 @@ function closeDeleteModal() {
 // ═══════════════════════════════
 // EVENT LISTENERS
 // ═══════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
 
   initEmojiPicker();
 
   // ✅ FORCE WEB APPS TAB
-  switchTab('apps');
+  switchTab("apps");
 
   listenProjects();
 
   // Add buttons
-  document.getElementById('add-scratch')
-    .addEventListener('click', () => openModal('scratch'));
+  document.getElementById("add-scratch")
+    .addEventListener("click", () => openModal("scratch"));
 
-  document.getElementById('add-ai')
-    .addEventListener('click', () => openModal('ai'));
+  document.getElementById("add-ai")
+    .addEventListener("click", () => openModal("ai"));
 
-  document.getElementById('add-apps')
-    .addEventListener('click', () => openModal('apps'));
+  document.getElementById("add-apps")
+    .addEventListener("click", () => openModal("apps"));
 
   // Delete buttons
-  document.getElementById('del-scratch')
-    .addEventListener('click', () => openDeleteModal('scratch'));
+  document.getElementById("del-scratch")
+    .addEventListener("click", () => openDeleteModal("scratch"));
 
-  document.getElementById('del-ai')
-    .addEventListener('click', () => openDeleteModal('ai'));
+  document.getElementById("del-ai")
+    .addEventListener("click", () => openDeleteModal("ai"));
 
-  document.getElementById('del-apps')
-    .addEventListener('click', () => openDeleteModal('apps'));
+  document.getElementById("del-apps")
+    .addEventListener("click", () => openDeleteModal("apps"));
 
-  // Modal close
-  document.getElementById('closeAddModal')
-    .addEventListener('click', closeModal);
+  // Close modals
+  document.getElementById("closeAddModal")
+    .addEventListener("click", closeModal);
 
-  document.getElementById('cancelAdd')
-    .addEventListener('click', closeModal);
+  document.getElementById("cancelAdd")
+    .addEventListener("click", closeModal);
 
-  document.getElementById('closeDeleteModal')
-    .addEventListener('click', closeDeleteModal);
+  document.getElementById("closeDeleteModal")
+    .addEventListener("click", closeDeleteModal);
 
-  document.getElementById('cancelDelete')
-    .addEventListener('click', closeDeleteModal);
+  document.getElementById("cancelDelete")
+    .addEventListener("click", closeDeleteModal);
 
 });
