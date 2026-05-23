@@ -150,39 +150,36 @@ function listenProjects() {
           ...doc.data()
         }));
 
+        console.log("All projects loaded:", allProjects);
+        console.log("Apps projects:", allProjects.filter(p => p.module === "apps"));
+        console.log("Scratch projects:", allProjects.filter(p => p.module === "scratch"));
+        console.log("AI projects:", allProjects.filter(p => p.module === "ai"));
+
         updateCounts();
 
-        // ✅ FORCE WEB APPS EVERY TIME
-        currentTab = "apps";
+        // ✅ RENDER ALL TABS AND FORCE WEB APPS FIRST
+        ["apps", "ai", "scratch"].forEach(module => {
+          renderProjects(module);
+        });
 
-        // Remove active
+        // Ensure Web Apps is visible
+        currentTab = "apps";
         document.querySelectorAll(".tab-btn").forEach(btn => {
           btn.classList.remove("active");
         });
+        document.querySelector('[data-tab="apps"]').classList.add("active");
 
-        // Activate apps
-        const appsBtn = document.querySelector('[data-tab="apps"]');
-
-        if (appsBtn) {
-          appsBtn.classList.add("active");
-        }
-
-        // Hide all grids
         document.querySelectorAll(".projects-grid").forEach(grid => {
           grid.style.display = "none";
         });
-
-        // Hide all headers
         document.querySelectorAll(".section-header").forEach(header => {
           header.style.display = "none";
         });
 
-        // Show apps
         document.getElementById("projectsGrid-apps").style.display = "grid";
         document.getElementById("header-apps").style.display = "flex";
 
-        // Render apps only
-        renderProjects("apps");
+        console.log("Current tab set to: apps");
 
       },
 
@@ -437,9 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initEmojiPicker();
 
-  // ✅ FORCE WEB APPS TAB
-  switchTab("apps");
-
+  // ✅ START FIRESTORE LISTENER (handles Web Apps default)
   listenProjects();
 
   // Add buttons
