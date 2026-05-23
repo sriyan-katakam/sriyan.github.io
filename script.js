@@ -152,8 +152,27 @@ function listenProjects() {
 
         updateCounts();
 
-        // ✅ RENDER CURRENT TAB (ALWAYS WEB APPS BY DEFAULT)
-        renderProjects(currentTab);
+        // ✅ RENDER ALL TABS AND FORCE WEB APPS FIRST
+        ["apps", "ai", "scratch"].forEach(module => {
+          renderProjects(module);
+        });
+
+        // Ensure Web Apps is visible
+        currentTab = "apps";
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+          btn.classList.remove("active");
+        });
+        document.querySelector('[data-tab="apps"]').classList.add("active");
+
+        document.querySelectorAll(".projects-grid").forEach(grid => {
+          grid.style.display = "none";
+        });
+        document.querySelectorAll(".section-header").forEach(header => {
+          header.style.display = "none";
+        });
+
+        document.getElementById("projectsGrid-apps").style.display = "grid";
+        document.getElementById("header-apps").style.display = "flex";
 
       },
 
@@ -408,9 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initEmojiPicker();
 
-  // ✅ FORCE WEB APPS TAB
-  switchTab("apps");
-
+  // ✅ START FIRESTORE LISTENER (handles Web Apps default)
   listenProjects();
 
   // Add buttons
