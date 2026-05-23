@@ -152,37 +152,8 @@ function listenProjects() {
 
         updateCounts();
 
-        // ✅ FORCE WEB APPS EVERY TIME
-        currentTab = "apps";
-
-        // Remove active
-        document.querySelectorAll(".tab-btn").forEach(btn => {
-          btn.classList.remove("active");
-        });
-
-        // Activate apps
-        const appsBtn = document.querySelector('[data-tab="apps"]');
-
-        if (appsBtn) {
-          appsBtn.classList.add("active");
-        }
-
-        // Hide all grids
-        document.querySelectorAll(".projects-grid").forEach(grid => {
-          grid.style.display = "none";
-        });
-
-        // Hide all headers
-        document.querySelectorAll(".section-header").forEach(header => {
-          header.style.display = "none";
-        });
-
-        // Show apps
-        document.getElementById("projectsGrid-apps").style.display = "grid";
-        document.getElementById("header-apps").style.display = "flex";
-
-        // Render apps only
-        renderProjects("apps");
+        // ✅ RENDER CURRENT TAB (ALWAYS WEB APPS BY DEFAULT)
+        renderProjects(currentTab);
 
       },
 
