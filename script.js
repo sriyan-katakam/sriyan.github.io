@@ -13,8 +13,8 @@ const db = firebase.firestore();
 const ADMIN_EMAIL = "sathish.katakam@gmail.com";
 let isAdmin = false;
 let allProjects = [];
-let currentTab = 'scratch';
-let currentModalTab = 'scratch';
+let currentTab = 'apps';
+let currentModalTab = 'apps';
 
 // ═══════════════════════════════
 // TAB SWITCHING (event delegation)
